@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#export OPENCL_INC_PATH=/usr/include
+#export HMPPRT_NO_FALLBACK=1
+export ACC_DEVICE_TYPE=acc_device_cuda
+#export HMPPRT_OPENCL_DEVICE_TYPE=CL_DEVICE_TYPE_ACCELERATOR
+#GRID_X=(1 128 16 8 32 4 64 2 128 1 256 32 16 8 64 2 256)
+#GRID_Y=(128 1 16 32 8 64 4 128 2 256 1 16 32 64 8 256 2)
+
+#GRID_X=(512 512 512)
+#GRID_Y=(1 1 1)
+
+GRID_X=(4 16 2 32 1 64 8 16 4 32 2 64 1 128 16 8 32 4 64 2 128 1 256 32 16 8 64 2 256 512)
+GRID_Y=(16 4 32 2 64 1 16 8 32 4 64 2 128 1 16 32 8 64 4 128 2 256 1 16 32 64 8 256 2 1)
+for INPUT in 2048.dat
+do
+	echo "============================" $INPUT "======================================"
+                for (( i = 0 ; i < ${#GRID_X[@]} ; i++ ))
+	 	do
+			echo ${GRID_X[$i]} x ${GRID_Y[$i]}
+			./omp/lud_oacc -i ../../data/lud/$INPUT -x ${GRID_X[$i]} -y ${GRID_Y[$i]}
+
+		done
+done
+

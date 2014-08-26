@@ -1,0 +1,25 @@
+TARGET= opencl
+
+FASTMATH= -O3 -axT -fimf-precision=low -fimf-domain-exclusion=31 -fimf-accuracy-bits=11 -no-prec-div -no-prec-sqrt -fp-model fast=2
+NVCC=--nvcc-options -keep#-Xptxas=-v,-prec-div=false,-gencode=arch=compute_30,code=sm_30
+
+
+CC = capsmc $(NVCC) --target=$(TARGET) --hdpp-off --color --keep gcc #$(FASTMATH) 
+#//CC = gcc
+CC_FLAGS = -g -fopenmp  -O2
+
+
+lud_oacc: ../common/common.o lud_oacc.o lud.o
+	$(CC) $(CC_FLAGS) ../common/common.o lud.o lud_oacc.o -o lud_oacc -lm
+
+%.o: %.[ch]
+	$(CC) $(CC_FLAGS) $< -c
+lud.o: lud_oacc.c lud.c
+	$(CC) $(CC_FLAGS) lud.c lud_oacc.c -c 
+lud_oacc.o: lud_oacc.c
+	$(CC) $(CC_FLAGS) lud_oacc.c -c
+common.o: ../common/common.c ../common/common.h
+	$(CC) $(CC_FLAGS) ../common/common.c ../common/common.h -c
+
+clean:
+	rm -f *.o *~ *_hmpp_* *.hmf* *.i *.cl *.dpil
